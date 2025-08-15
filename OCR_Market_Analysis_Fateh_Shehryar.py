@@ -32,11 +32,18 @@ def etl_parse_home(homeurl):
     home_soup = BeautifulSoup(home_page.text, 'html.parser')
     categories = home_soup.find("div", class_="side_categories").find_all("a")
     categories_url = []
+    category_text = []
     for category in categories:
         abs_url = urljoin(homeurl, category.get('href'))
+
+        """Below string.replace(" ","") wasn't working
+        as I still got \n in the outputs. However string.strip()
+        worked and gave the right output"""
+        category_text.append(category.string.strip())
         categories_url.append(abs_url)
 
     print(categories_url)
+    print(category_text)
     
 
 
