@@ -26,15 +26,19 @@ def etl_extract_page(pageurl):
     category = page_soup.find("a", string = "Books").find_next("a").string
     print(category)
     #review_rating = page_soup
-"""
+
 def etl_parse_home(homeurl):
     home_page = requests.get(homeurl)
     home_soup = BeautifulSoup(home_page.text, 'html.parser')
-    catergories = home_soup.find("div", class_="side categories")
-    category_list = catergories.findChildren("a")
-    for book_type in category_list:
-        category_type = category_list.string
-"""
+    categories = home_soup.find("div", class_="side_categories").find_all("a")
+    categories_url = []
+    for category in categories:
+        abs_url = urljoin(homeurl, category.get('href'))
+        categories_url.append(abs_url)
+
+    print(categories_url)
+    
+
 
 def etl_category_page(cateurl):
 
@@ -61,7 +65,7 @@ def etl_category_page(cateurl):
         
 
 def main():
-    etl_category_page("https://books.toscrape.com/catalogue/category/books/fiction_10/index.html")
+    etl_parse_home("https://books.toscrape.com/index.html")
 
 if __name__ == "__main__":
     main()
