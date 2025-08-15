@@ -47,7 +47,8 @@ def etl_category_page(cateurl):
         books_in_category = category_soup.find_all("div", class_="image_container")
         
         for book in books_in_category:
-            category_books_links.append(book.find("a").get('href'))
+            book_url = urljoin(new_url, (book.find("a").get('href')))
+            category_books_links.append(book_url)
         
         if len(category_soup.find_all("li", class_="next")) == 0:
             break
