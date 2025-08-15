@@ -1,4 +1,5 @@
-import pandas
+import csv
+import re
 from bs4 import BeautifulSoup
 import requests
 from urllib.parse import urljoin
@@ -9,23 +10,44 @@ def etl_extract_page(pageurl):
     product_response = requests.get(pageurl)
     page_soup = BeautifulSoup(product_response.text, 'html.parser')
     #print(page_soup.prettify())
+    book_info = {}
     product_page_url = pageurl
-    print(product_page_url)
+    #print(product_page_url)
     book_title = page_soup.title.string
-    print(book_title)
+    #print(book_title)
     univeral_product_code = page_soup.find("th", string="UPC").find_next_sibling("td").string
-    print(univeral_product_code)
+    #print(univeral_product_code)
     price_including_tax = page_soup.find("th", string= "Price (excl. tax)").find_next_sibling("td").string
-    print(price_including_tax)
+    #print(price_including_tax)
     price_excluding_tax = page_soup.find("th", string = "Price (incl. tax)").find_next_sibling("td").string
-    print(price_excluding_tax)
+    #print(price_excluding_tax)
     quantity_available = page_soup.find("th", string = "Availability").find_next_sibling("td").string
-    print(quantity_available)
+    #print(quantity_available)
     product_description = page_soup.find("div", attrs = {"id":"product_description"}).find_next_sibling("p").string
-    print(product_description)
+    #print(product_description)
     category = page_soup.find("a", string = "Books").find_next("a").string
-    print(category)
-    #review_rating = page_soup
+    #print(category)
+    """Review_rating below was a lucky call since I didn't 
+    realize that a get('class') would return a list that
+    is separated by a comma. I visualized it in the result
+    dictionary and picked up on it"""
+    review_rating = page_soup.find("p", class_=re.compile("star-rating")).get('class')[1]
+    image_url_relative = page_soup.find("img").get('src')
+    image_url = urljoin(pageurl, image_url_relative)
+    book_info = {"product page url": product_page_url,
+                  "book title": book_title,
+                  "univeral product code": univeral_product_code,
+                  "price including tax": price_including_tax,
+                  "price excluding tax": price_excluding_tax,
+                  "quantity available": quantity_available,
+                  "product description": product_description,
+                  "category": category,
+                  "review rating": review_rating,
+                  "image url": image_url}
+    
+    print(book_info)
+    return book_info
+
 
 def etl_parse_home(homeurl):
     home_page = requests.get(homeurl)
@@ -72,7 +94,7 @@ def etl_category_page(cateurl):
         
 
 def main():
-    etl_parse_home("https://books.toscrape.com/index.html")
+    etl_extract_page("https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html")
 
 if __name__ == "__main__":
     main()
