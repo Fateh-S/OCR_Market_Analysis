@@ -1,3 +1,4 @@
+import os
 import csv
 import re
 from bs4 import BeautifulSoup
@@ -94,15 +95,70 @@ def etl_category_page(cateurl):
     #print(category_books_links)
     return category_books_links
 
-        
+def etl_load(load_data, output_file_path, field_name_header):
+
+    #Since csv file already perform a newline by themselves hence we have to specify an empty newline here so it doesn't skip rows
+    with open(output_file_path, mode = "w", newline="") as file_name:
+        file_write = csv.DictWriter(file_name, delimiter=",", fieldnames= field_name_header)   
+        file_write.writeheader()
+
+        for data in load_data:
+            file_write.writerow(data)    
 
 def main():
-    etl_parse_home("https://books.toscrape.com/index.html")
+
+    script_directory = os.path.dirname(os.path.abspath(__file__))
+    home_url = input("Enter the homepage url you want to parse: ")
+    response = requests.get(home_url, 'html.parser')
+    if response.ok is True:
+        category_info = etl_parse_home(home_url)
+        for item in category_info:
+            print(item)
+    
+    else:
+        print("Either the website isn't responsive or you entered the wrong url.")
+    
+    type_category = input("Enter the category from the list you want to load(type 'all' for all): ")
+    
+    list_size = 0
+    #print(len(category_info))
+    while list_size <= len(category_info):
+        if item!=type_category and list_size < len(category_info):
+            list_size = list_size + 1
+
+        elif item == type_category or type_category == "all":
+
+            while True:
+                for item in category_info:
+                    category_url = category_info[item]
+                    book_urls = etl_category_page(category_url)
+                    for urls in book_urls:
+                        book_info = etl_extract_page(urls)
+                    load_path = os.path.join(script_directory, (f"{item}.csv"))
+                    print()
+                    break
+                    #etl_load(load_data, load_path, )
+                #print(f"I'll go ahead and parse {type_category}")
+                #break
+
+        elif item != type_category and list_size == len(category_info):
+            print("Category Mismatch")
+            break
+
+        else:
+            print("Unknown Error")
+    
+    
+        
+        
+        
+            
+
+
+    
 
 if __name__ == "__main__":
     main()
     
-
-
 
 
