@@ -53,19 +53,21 @@ def etl_parse_home(homeurl):
     home_page = requests.get(homeurl)
     home_soup = BeautifulSoup(home_page.text, 'html.parser')
     categories = home_soup.find("div", class_="side_categories").find_all("a")
-    categories_url = []
-    category_text = []
+    category_text = ""
+    categories_url = ""
+    category_info = {}
     for category in categories:
         abs_url = urljoin(homeurl, category.get('href'))
 
         """Below string.replace(" ","") wasn't working
         as I still got \n in the outputs. However string.strip()
         worked and gave the right output"""
-        category_text.append(category.string.strip())
-        categories_url.append(abs_url)
+        #category_text.append(category.string.strip())
+        #categories_url.append(abs_url)
+        category_info[category.string.strip()] = abs_url
 
-    print(categories_url)
-    print(category_text)
+    #print(category_info)
+    return category_info
     
 
 
@@ -89,12 +91,13 @@ def etl_category_page(cateurl):
         new_url = urljoin(new_url, pagination)
         category_soup = BeautifulSoup(requests.get(new_url).text, 'html.parser')
 
-    print(category_books_links)
+    #print(category_books_links)
+    return category_books_links
 
         
 
 def main():
-    etl_extract_page("https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html")
+    etl_parse_home("https://books.toscrape.com/index.html")
 
 if __name__ == "__main__":
     main()
