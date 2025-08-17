@@ -6,12 +6,12 @@ import requests
 from urllib.parse import urljoin
 
 
-def etl_extract_page(pageurl):
+def extract_book(pageurl):
 
     product_response = requests.get(pageurl)
     page_soup = BeautifulSoup(product_response.text, 'html.parser')
     #print(page_soup.prettify())
-    book_info = {}
+    book_info = []
     product_page_url = pageurl
     #print(product_page_url)
     book_title = page_soup.title.string
@@ -24,7 +24,14 @@ def etl_extract_page(pageurl):
     #print(price_excluding_tax)
     quantity_available = page_soup.find("th", string = "Availability").find_next_sibling("td").string
     #print(quantity_available)
-    product_description = page_soup.find("div", attrs = {"id":"product_description"}).find_next_sibling("p").string
+    product_description = page_soup.find("div", attrs = {"id":"product_description"})
+    """Found an error here where a product didn't have a description,
+    figured my best bet before I run all is to run books, since 
+    that category had all the books in it. Ran successfully after this change"""
+    if product_description:
+        product_description = product_description.find_next_sibling("p").string
+    else:
+        product_description = "No Description"
     #print(product_description)
     category = page_soup.find("a", string = "Books").find_next("a").string
     #print(category)
@@ -35,22 +42,22 @@ def etl_extract_page(pageurl):
     review_rating = page_soup.find("p", class_=re.compile("star-rating")).get('class')[1]
     image_url_relative = page_soup.find("img").get('src')
     image_url = urljoin(pageurl, image_url_relative)
-    book_info = {"product page url": product_page_url,
-                  "book title": book_title,
-                  "univeral product code": univeral_product_code,
-                  "price including tax": price_including_tax,
-                  "price excluding tax": price_excluding_tax,
-                  "quantity available": quantity_available,
-                  "product description": product_description,
-                  "category": category,
-                  "review rating": review_rating,
-                  "image url": image_url}
+    book_info = [product_page_url,
+                book_title,
+                univeral_product_code,
+                price_including_tax,
+                price_excluding_tax,
+                quantity_available,
+                product_description,
+                category,
+                review_rating,
+                image_url]
     
-    print(book_info)
+    #print(book_info)
     return book_info
 
 
-def etl_parse_home(homeurl):
+def extract_home(homeurl):
     home_page = requests.get(homeurl)
     home_soup = BeautifulSoup(home_page.text, 'html.parser')
     categories = home_soup.find("div", class_="side_categories").find_all("a")
@@ -72,7 +79,7 @@ def etl_parse_home(homeurl):
     
 
 
-def etl_category_page(cateurl):
+def extract_category(cateurl):
 
     category_response = requests.get(cateurl)
     category_soup = BeautifulSoup(category_response.text, 'html.parser')
@@ -98,55 +105,130 @@ def etl_category_page(cateurl):
 def etl_load(load_data, output_file_path, field_name_header):
 
     #Since csv file already perform a newline by themselves hence we have to specify an empty newline here so it doesn't skip rows
-    with open(output_file_path, mode = "w", newline="") as file_name:
-        file_write = csv.DictWriter(file_name, delimiter=",", fieldnames= field_name_header)   
-        file_write.writeheader()
+    with open(output_file_path, mode = "w", newline="", encoding="utf-8-sig", errors="replace") as file_name:
+        file_write = csv.writer(file_name)   
+        file_write.writerow(field_name_header)
 
-        for data in load_data:
-            file_write.writerow(data)    
+        #for data in load_data:
+            
+        file_write.writerows(load_data)    
 
+  
 def main():
 
+    field_header = ["Product Page URL",
+                    "Book Title",
+                    "Universal Product Code",
+                    "Price Including Tax",
+                    "Price Excluding Tax",
+                    "Quantity Available",
+                    "Product Description",
+                    "Category",
+                    "Review Rating",
+                    "Image URL"]
     script_directory = os.path.dirname(os.path.abspath(__file__))
     home_url = input("Enter the homepage url you want to parse: ")
     response = requests.get(home_url, 'html.parser')
     if response.ok is True:
-        category_info = etl_parse_home(home_url)
-        for item in category_info:
+        category_info = extract_home(home_url)
+        for item in category_info.keys():
             print(item)
+
+            #print(category_info.keys())
+        #item = str(item).strip()
     
     else:
         print("Either the website isn't responsive or you entered the wrong url.")
     
     type_category = input("Enter the category from the list you want to load(type 'all' for all): ")
     
+    """book_info = []
     list_size = 0
+    typed_cat_link = str(category_info[type_category]).strip()
+    category_links = []
     #print(len(category_info))
-    while list_size <= len(category_info):
-        if item!=type_category and list_size < len(category_info):
-            list_size = list_size + 1
+    for value in category_info.values():
+        category_links.append(value)
+    
+    
+    while list_size < len(category_info):
+        if typed_cat_link != category_links[list_size]:
+                list_size = list_size + 1
+                continue
+        #print(category_info[type_category])
+        if typed_cat_link == str(category_links[list_size]).strip() or type_category == "all":
 
-        elif item == type_category or type_category == "all":
 
-            while True:
-                for item in category_info:
-                    category_url = category_info[item]
-                    book_urls = etl_category_page(category_url)
-                    for urls in book_urls:
-                        book_info = etl_extract_page(urls)
-                    load_path = os.path.join(script_directory, (f"{item}.csv"))
-                    print()
+            
+            
+
+            
+            for item in category_info:
+                load_path = os.path.join(script_directory, (f"{item}.csv"))
+                category_url = category_info[item]
+                book_urls = extract_category(category_url)
+                for urls in book_urls:
+                    book_info.append(extract_book(urls))
+  
+                    
+                if type_category == "all":
+                    initiate_csv = etl_load(book_info, load_path, field_header)
+                    print("The file/s is/are created.")
+
+                else:
+                    initiate_csv = etl_load(book_info, load_path, field_header) 
+                    print("Please make sure your csv file has no issues.")
                     break
+            
                     #etl_load(load_data, load_path, )
-                #print(f"I'll go ahead and parse {type_category}")
-                #break
+                    
+            print(f"Please check for csv file for the category {type_category}")
+                
 
-        elif item != type_category and list_size == len(category_info):
+        elif typed_cat_link != category_links[list_size] and list_size < len(category_info):
             print("Category Mismatch")
             break
 
         else:
-            print("Unknown Error")
+            print("Category Mismatch")
+            break"""
+    
+    book_info = []
+    typed_cat_link = str(category_info.get(type_category, "")).strip()
+    category_links = list(category_info.values())
+
+    if type_category == "all":
+        # Process all categories
+        for item, category_url in category_info.items():
+            book_info = []  # reset for each category
+            load_path = os.path.join(script_directory, f"{item}.csv")
+
+            book_urls = extract_category(category_url)
+            for url in book_urls:
+                book_info.append(extract_book(url))
+
+            etl_load(book_info, load_path, field_header)
+            print(f"CSV created for category {item}")
+
+        print("The file/s are created. Please check your CSV files.")
+
+    elif typed_cat_link in category_links:
+        # Process just one category
+        book_info = []
+        category_url = category_info[type_category]
+        load_path = os.path.join(script_directory, f"{type_category}.csv")
+
+        book_urls = extract_category(category_url)
+        for url in book_urls:
+            book_info.append(extract_book(url))
+
+        etl_load(book_info, load_path, field_header)
+        print(f"CSV created for category {type_category}. Please check the file.")
+
+    else:
+        print("Category Mismatch")
+
+        
     
     
         
