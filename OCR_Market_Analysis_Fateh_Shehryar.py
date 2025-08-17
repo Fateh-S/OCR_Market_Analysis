@@ -18,9 +18,9 @@ def extract_book(pageurl):
     #print(book_title)
     univeral_product_code = page_soup.find("th", string="UPC").find_next_sibling("td").string
     #print(univeral_product_code)
-    price_including_tax = page_soup.find("th", string= "Price (excl. tax)").find_next_sibling("td").string
+    price_including_tax = page_soup.find("th", string= "Price (excl. tax)").find_next_sibling("td").string.replace("Â", "")
     #print(price_including_tax)
-    price_excluding_tax = page_soup.find("th", string = "Price (incl. tax)").find_next_sibling("td").string
+    price_excluding_tax = page_soup.find("th", string = "Price (incl. tax)").find_next_sibling("td").string.replace("Â", "")
     #print(price_excluding_tax)
     quantity_available = page_soup.find("th", string = "Availability").find_next_sibling("td").string
     #print(quantity_available)
@@ -29,7 +29,7 @@ def extract_book(pageurl):
     figured my best bet before I run all is to run books, since 
     that category had all the books in it. Ran successfully after this change"""
     if product_description:
-        product_description = product_description.find_next_sibling("p").string
+        product_description = product_description.find_next_sibling("p").string.replace("â","'")
     else:
         product_description = "No Description"
     #print(product_description)
@@ -101,10 +101,13 @@ def extract_category(cateurl):
 
     #print(category_books_links)
     return category_books_links
-
+"""The system was giving me an etl_load error and it turns out it was because I had
+the csv file open and was trying to write it at the same time. Just read the error 
+it was a permission error, getting to know how to read errors"""
 def etl_load(load_data, output_file_path, field_name_header):
 
     #Since csv file already perform a newline by themselves hence we have to specify an empty newline here so it doesn't skip rows
+    """If I turn the encoding to utf-16 and add a tab delimiter somehow the book titles disappear"""
     with open(output_file_path, mode = "w", newline="", encoding="utf-8-sig", errors="replace") as file_name:
         file_write = csv.writer(file_name)   
         file_write.writerow(field_name_header)
@@ -127,7 +130,10 @@ def main():
                     "Review Rating",
                     "Image URL"]
     script_directory = os.path.dirname(os.path.abspath(__file__))
-    home_url = input("Enter the homepage url you want to parse: ")
+    home_url = input("Enter the homepage url you want to parse( press 1 to enter https://books.toscrape.com/index.html automatically): ")
+    if home_url == "1":
+        home_url = "https://books.toscrape.com/index.html"
+        
     response = requests.get(home_url, 'html.parser')
     if response.ok is True:
         category_info = extract_home(home_url)
