@@ -17,3 +17,17 @@
 
 A textual terminal feed that requests for instructions on which it performs the following for the website (Books to Scrape):
 
+
+> #### Extracting Book Details
+>> This includes all the necessary information regarding the meta data of the book. Includes the following information:
+>> 1. The absolute page url of the book.
+>> 2. Book Title
+>> 3. Universal Product Code
+>> 4. Price (Including Tax)
+>> 5. Price (Excluding Tax)
+>> 6. Quantity Available
+>> 7. Product Description
+>> 8. Category 
+>> 9. Review Rating
+>> 10. Absolute Image URL
+
