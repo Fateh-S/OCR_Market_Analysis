@@ -5,7 +5,7 @@
 
 
 <p align="center">
-  <img src="https://images.rawpixel.com/image_png_800/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIyLTA0L3B4ODk1NjA3LWltYWdlLTAxLWpvYjcwNi5wbmc.png
+  <img src="https://png.pngtree.com/png-clipart/20220107/ourmid/pngtree-book-png-image_4224464.png
   " alt="Book Scraping" width="200"/>
 </p>
 
