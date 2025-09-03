@@ -5,8 +5,8 @@
 
 
 <p align="center">
-  <img src="https://drive.google.com/file/d/1szATff14AfaYpezCXUCGA9TRTzgdlikW/view?usp=sharing
-  " alt="Book Scraping" width="500"/>
+  <img src="https://images.rawpixel.com/image_png_800/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIyLTA0L3B4ODk1NjA3LWltYWdlLTAxLWpvYjcwNi5wbmc.png
+  " alt="Book Scraping" width="200"/>
 </p>
 
 ---
