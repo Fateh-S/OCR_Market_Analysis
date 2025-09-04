@@ -17,7 +17,9 @@
 
 A textual terminal feed that requests for instructions on which it performs the following for the website (Books to Scrape):
 
-
+> ### Pagination (Extraction)
+>> The Script makes sure to cover extractions of book data regardless of the number of pages. It will loop through them all regardless of the number of pages.
+---
 > ###  Extract
 >     📝 Book Details
 >> This includes all the necessary information regarding the meta data of the book. Includes the following information:
@@ -41,6 +43,9 @@ A textual terminal feed that requests for instructions on which it performs the 
 > ### 💾 Load
 >> - Save data into UTF-8 CSVs (Excel-friendly, no weird encoding issues).
 >> - Neat and organized data managed under their respective fieldnames.
+---
+> ### Safe-Naming (Windows) 
+>> - Will make sure file name fall under OS naming standards and omits any special characters that aren't allowed.
 ---
 > ### 📂 Smart Folder Hierarchy
 >> - Images and CSVs go into an organzied forlder structure
@@ -75,3 +80,90 @@ Clone the [repository](https://github.com/Fateh-S/OCR_Market_Analysis/tree/dev) 
 - re (built-in)
 - os (built-in)
 - urllib (built-in)
+---
+---
+
+## Usage
+
+### On Windows (Bash)
+
+1.  Traverse to the installed folder: 
+
+> $ cd Parent_Folders/Installed_Folder
+
+2. Create a Virtual Environment:
+
+> $ pyton -m venv venv
+
+3. Activate te Virtual Environment:
+
+> source venv/Scripts/activate
+
+4. Install the required libraries:
+
+> pip install -r requirements.txt
+
+OR explicitly install the following libraries:
+
+> requests<br>
+> bs4
+
+5. Run the Script (Bash):
+>
+>> $ python OCR_Market_Analysis_Fateh_Shehryar.py<br>
+>
+> You will be prompted with the options to choose between the operations:
+>>---
+>> CSV file/s generation (Press 1)<br>
+>>> A prompt will then be generated asking you to choose between creating all CSV file or to create just for te typed one: <br>
+>>>
+>>> Type 'all'
+>>>> 1. This will create all the CSV for each category and store them in their respective categories.
+>>>>
+>>>> 2. Prompt user to check files once done.
+>>> 
+>>> Type 'Category Name'
+>>>> 1. Creates CSV for that respective category in it's respective folder. <br>
+>>>>
+>>>> 2. Prompts user to check file once done.
+>> ---
+>>
+>> Image Downloader (Press 2) <br>
+>>> The system will ask for the URL for the bookpage that requires the extraction of it's image.
+>>>> 1. Save the image of the Book Name in it's respective folder with the Book Name.
+>>>>
+>>>> 2. File is currently being saved as a png.
+>>>>
+>>>> 3. Prompts user to check files.
+
+---
+---
+
+## 🛡 Notes and Caveats
+
+ * Functions only with Books To Scrape's [website](https://books.toscrape.com/index.html).
+
+ * If you use Excel, make sure to open CSVs with UTF-8 encoding (they’re saved as utf-8-sig).
+
+ * Transforming data isn't yet added to the Script.
+---
+---
+
+## 🌟 Future Additions
+
+* Adding data transformation 
+* Adding features for data visualization
+* Generalize to scrape other e-commerce websites
+
+---
+---
+
+## 📜 Licence
+
+MIT License © 2025 Fateh Shehryar
+---
+---
+
+
+
+
