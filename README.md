@@ -1,7 +1,7 @@
 <H1 align="center"> OCR Market Analysis</H1>
 
 ### About
-*Book information tracking from [Books to Scrape](https://books.toscrape.com/index.html). Currently an extract and load pipline only. With CSV file generator, folder organizer and image downloader.*
+*Book information tracking from [Books to Scrape](https://books.toscrape.com/index.html). Currently a basic form of an ETL pipeline. With CSV file generator, folder organizer and image downloader.*
 
 
 <p align="center">
